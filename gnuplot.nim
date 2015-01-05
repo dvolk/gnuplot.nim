@@ -15,14 +15,18 @@ type Style* = enum
          Boxes
          Boxerrorbars
 
-var gp : Process
-var nplots : int = 0
-var style : Style = Lines
+var
+    gp : Process
+    nplots = 0
+    style : Style = Lines
+let
+    gnuplot_exe = "/usr/bin/gnuplot"
 
 try:
-    gp = startProcess "/usr/bin/gnuplot"
+    gp = startProcess gnuplot_exe
 except:
-    echo "Error: Couldn't start gnuplot"
+    echo "Error: Couldn't start " & gnuplot_exe
+    echo "Edit the gnuplot_exe path in gnuplot.nim if your gnuplot executable is elsewhere"
     quit 1
 
 proc plotCmd() : string =
@@ -34,11 +38,20 @@ proc tmpFilename() : string =
 proc cmd*(cmd : string) =
     echo cmd
     ## send a raw command to gnuplot
-    gp.inputStream.writeln cmd
-    gp.inputStream.flush
+    try:
+        gp.inputStream.writeln cmd
+        gp.inputStream.flush
+    except:
+        echo "Error: Couldn't send command to gnuplot"
+        quit 1
 
 proc sendPlot(arg : string, title : string, extra : string = "") =
-    let line = plotCmd() & arg & extra &" title \"" & title & "\" with "  & toLower($style)
+    let
+        title_line =
+            if title == "": " notitle"
+            else: " title \"" & title & "\""
+        line = (plotCmd() & arg & extra & title_line &
+                " with " & toLower($style))
     cmd line
     nplots = nplots + 1
     
@@ -50,7 +63,7 @@ proc plot*(equation : string) =
     sendPlot equation, equation
 
 proc plot*( xs : openarray[float64]
-          , title : string = "no plot title") =
+          , title = "") =
     ## plot an array or seq of float64 values. e.g.:
     ##
     ## .. code-block:: nim
@@ -60,15 +73,19 @@ proc plot*( xs : openarray[float64]
     ##
     ##   plot xs, "random values"
     let fname = tmpFilename()
-    let f = open(fname, fmWrite)
-    for x in xs:
-        writeln f, x
-    f.close
+    try:
+        let f = open(fname, fmWrite)
+        for x in xs:
+            writeln f, x
+        f.close
+    except:
+        echo "Error: Couldn't write to temporary file: " & fname
+        quit 1
     sendPlot("\"" & fname & "\"", title)
 
 proc plot*[X, Y]( xs : openarray[X]
                 , ys : openarray[Y]
-                , title : string = "no plot title") =
+                , title = "") =
     ## plot points taking x and y values from corresponding pairs in
     ## the given arrays.
     ##
@@ -109,12 +126,15 @@ proc plot*[X, Y]( xs : openarray[X]
     ##       Y[i] = f * cos(f)
     ##       
     ##   plot X, Y, "spiral"
-
     let fname = tmpFilename()
-    let f = open(fname, fmWrite)
-    for i in xs.low..xs.high:
-        writeln f, xs[i], " ", ys[i]
-    f.close
+    try:
+        let f = open(fname, fmWrite)
+        for i in xs.low..xs.high:
+            writeln f, xs[i], " ", ys[i]
+        f.close
+    except:
+        echo "Error: Couldn't write to temporary file: " & fname
+        quit 1
     sendPlot("\"" & fname & "\"", title, " using 1:2")
 
 proc set_style*(s : Style) =

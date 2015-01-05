@@ -4,7 +4,7 @@ gnuplot.nim
 Nim interface to gnuplot
 
 ```nimrod
-import math, sequtils, os, gnuplot
+import math, sequtils, gnuplot
 
 let
    X = ["2014-01-29",
@@ -26,5 +26,5 @@ cmd "set xdata time"
     
 plot X, Y, "buttcoin value"
 
-sleep 20_000
+discard readChar stdin
 ```
