@@ -1,4 +1,4 @@
-import math, sequtils, os, gnuplot
+import math, random, sequtils, os, gnuplot
 
 let
    X = ["2014-01-29",
