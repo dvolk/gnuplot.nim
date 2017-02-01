@@ -127,7 +127,8 @@ proc plot*[X, Y](xs: openarray[X],
   ##       Y[i] = f * cos(f)
   ##
   ##   plot X, Y, "spiral"
-  assert xs.len == ys.len, "xs and ys must have same length"
+  if xs.len != ys.len:
+    raise newException(ValueError, "xs and ys must have same length")
   let fname = tmpFilename()
   try:
     let f = open(fname, fmWrite)
