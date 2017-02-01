@@ -6,14 +6,14 @@ import osproc, os, streams, times, random, strutils
 
 type
   Style* = enum
-    Lines
-    Points
-    Linepoints
-    Impulses
-    Dots
-    Steps
-    Errorbars
-    Boxes
+    Lines,
+    Points,
+    Linepoints,
+    Impulses,
+    Dots,
+    Steps,
+    Errorbars,
+    Boxes,
     Boxerrorbars
 
 var
