@@ -1,4 +1,4 @@
-import osproc, os, streams, times, math, strutils
+import osproc, os, streams, times, math, random, strutils
 
 ## Importing this module will start gnuplot. Array contents are written
 ## to temporary files (in /tmp) and then loaded by gnuplot. The temporary
@@ -31,7 +31,7 @@ except:
 
 proc plotCmd() : string =
     if nplots == 0: "plot " else: "replot "
-    
+
 proc tmpFilename() : string =
     "/tmp/" & $epochTime() & "-" & $random(1000) & ".tmp"
 
@@ -39,7 +39,7 @@ proc cmd*(cmd : string) =
     echo cmd
     ## send a raw command to gnuplot
     try:
-        gp.inputStream.writeln cmd
+        gp.inputStream.writeLine cmd
         gp.inputStream.flush
     except:
         echo "Error: Couldn't send command to gnuplot"
@@ -51,10 +51,10 @@ proc sendPlot(arg : string, title : string, extra : string = "") =
             if title == "": " notitle"
             else: " title \"" & title & "\""
         line = (plotCmd() & arg & extra & title_line &
-                " with " & toLower($style))
+                " with " & toLowerAscii($style))
     cmd line
     nplots = nplots + 1
-    
+
 proc plot*(equation : string) =
     ## Plot an equation as understood by gnuplot. e.g.:
     ##
@@ -76,7 +76,7 @@ proc plot*( xs : openarray[float64]
     try:
         let f = open(fname, fmWrite)
         for x in xs:
-            writeln f, x
+            writeLine f, x
         f.close
     except:
         echo "Error: Couldn't write to temporary file: " & fname
@@ -119,18 +119,18 @@ proc plot*[X, Y]( xs : openarray[X]
     ##   var
     ##       X = newSeq[float64](100)
     ##       Y = newSeq[float64](100)
-    ##   
+    ##
     ##   for i in 0.. <100:
     ##       let f = float64(i)
     ##       X[i] = f * sin(f)
     ##       Y[i] = f * cos(f)
-    ##       
+    ##
     ##   plot X, Y, "spiral"
     let fname = tmpFilename()
     try:
         let f = open(fname, fmWrite)
         for i in xs.low..xs.high:
-            writeln f, xs[i], " ", ys[i]
+            writeLine f, xs[i], " ", ys[i]
         f.close
     except:
         echo "Error: Couldn't write to temporary file: " & fname
@@ -140,4 +140,3 @@ proc plot*[X, Y]( xs : openarray[X]
 proc set_style*(s : Style) =
     ## set plotting style
     style = s
-    
