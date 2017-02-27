@@ -20,21 +20,18 @@ var
   gp: Process
   nplots = 0
   style: Style = Lines
-let
-  gnuplot_exe = "/usr/bin/gnuplot"
 
 try:
-  gp = startProcess gnuplot_exe
+  gp = startProcess findExe("gnuplot")
 except:
-  echo "Error: Couldn't start " & gnuplot_exe
-  echo "Edit the gnuplot_exe path in gnuplot.nim if your gnuplot executable is elsewhere"
+  echo "Error: Couldn't start gnuplot, exe is not found"
   quit 1
 
 proc plotCmd(): string =
   if nplots == 0: "plot " else: "replot "
 
 proc tmpFilename(): string =
-  "/tmp/" & $epochTime() & "-" & $random(1000) & ".tmp"
+  getTempDir() & $epochTime() & "-" & $random(1000) & ".tmp"
 
 proc cmd*(cmd: string) =
   echo cmd
@@ -127,6 +124,8 @@ proc plot*[X, Y](xs: openarray[X],
   ##       Y[i] = f * cos(f)
   ##
   ##   plot X, Y, "spiral"
+  if xs.len != ys.len:
+    raise newException(ValueError, "xs and ys must have same length")
   let fname = tmpFilename()
   try:
     let f = open(fname, fmWrite)
