@@ -140,3 +140,8 @@ proc plot*[X, Y](xs: openarray[X],
 proc set_style*(s: Style) =
   ## set plotting style
   style = s
+
+addQuitProc(proc() {.noconv.} =
+  # close gnuplot process at the end of the session
+  gp.close
+)
