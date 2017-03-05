@@ -60,9 +60,9 @@ proc plot*(equation: string) =
   ##   plot "sin(x)/x"
   sendPlot equation, equation
 
-proc plot*(xs: openarray[float64],
+proc plot*[X: SomeNumber](xs: openarray[X],
           title = "") =
-  ## plot an array or seq of float64 values. e.g.:
+  ## plot an array or seq of number values. e.g.:
   ##
   ## .. code-block:: nim
   ##   import math, sequtils
@@ -81,7 +81,7 @@ proc plot*(xs: openarray[float64],
     quit 1
   sendPlot("\"" & fname & "\"", title)
 
-proc plot*[X, Y](xs: openarray[X],
+proc plot*[X, Y: SomeNumber](xs: openarray[X],
                 ys: openarray[Y],
                 title = "") =
   ## plot points taking x and y values from corresponding pairs in
@@ -137,6 +137,6 @@ proc plot*[X, Y](xs: openarray[X],
     quit 1
   sendPlot("\"" & fname & "\"", title, " using 1:2")
 
-proc set_style*(s: Style) =
+proc setStyle*(s: Style) =
   ## set plotting style
   style = s
