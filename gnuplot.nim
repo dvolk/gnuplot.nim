@@ -31,7 +31,10 @@ proc plotCmd(): string =
   if nplots == 0: "plot " else: "replot "
 
 proc tmpFilename(): string =
-  getTempDir() & $epochTime() & "-" & $random(1000) & ".tmp"
+  when defined(Windows):
+    (getEnv("TEMP") / ($epochTime() & "-" & $rand(1000) & ".tmp")).replace("\\", "/")
+  else:
+    getTempDir() & $epochTime() & "-" & $rand(1000) & ".tmp"
 
 proc cmd*(cmd: string) =
   echo cmd
