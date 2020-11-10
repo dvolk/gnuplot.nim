@@ -8,7 +8,7 @@ type
   Style* = enum
     Lines,
     Points,
-    Linepoints,
+    Linespoints,
     Impulses,
     Dots,
     Steps,
